@@ -5,15 +5,22 @@ import fetchPlanets from '../services/api';
 
 function PlanetProvider({ children }) {
   const [planetsInfo, setPlanetsInfo] = useState([]);
+  const [filterByName, setFilterByName] = useState('');
 
   async function getPlanetInfo() {
     const planetsInfoResponse = await fetchPlanets();
     setPlanetsInfo(planetsInfoResponse);
   }
+  const Handlefilter = ({ target }) => {
+    const { value } = target;
+    setFilterByName(value);
+  };
 
   const contextValue = {
     planetsInfo,
     getPlanetInfo,
+    filterByName,
+    Handlefilter,
   };
 
   return (
