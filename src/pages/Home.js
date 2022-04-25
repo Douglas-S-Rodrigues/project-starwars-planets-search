@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect } from 'react';
 import PlanetContext from '../context/PlanetContext';
 import Table from '../components/Table';
@@ -7,8 +8,7 @@ function Home() {
 
   useEffect(() => {
     getPlanetInfo();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   return (
     <Table />
