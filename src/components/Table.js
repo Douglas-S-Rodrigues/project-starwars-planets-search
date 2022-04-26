@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import PlanetContext from '../context/PlanetContext';
+import FilterByNumber from '../filters/FilterByNumber';
 
 function Table() {
   const { planetsInfo, filterByName, Handlefilter } = useContext(PlanetContext);
@@ -11,6 +12,7 @@ function Table() {
         value={ filterByName }
         onChange={ Handlefilter }
       />
+      <FilterByNumber />
       <table>
         <thead>
           <tr>

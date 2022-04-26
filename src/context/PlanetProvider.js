@@ -6,6 +6,7 @@ import fetchPlanets from '../services/api';
 function PlanetProvider({ children }) {
   const [planetsInfo, setPlanetsInfo] = useState([]);
   const [filterByName, setFilterByName] = useState('');
+  const [filterByNumbers, setFilterByNumbers] = useState([]);
 
   async function getPlanetInfo() {
     const planetsInfoResponse = await fetchPlanets();
@@ -16,11 +17,34 @@ function PlanetProvider({ children }) {
     setFilterByName(value);
   };
 
+  const numberFilter = (column, comparison, value) => {
+    let planets = [];
+
+    switch (comparison) {
+    case 'maior que':
+      planets = planetsInfo.filter((item) => Number(item[column]) > value);
+      break;
+    case 'menor que':
+      planets = planetsInfo.filter((item) => Number(item[column]) < value);
+      break;
+    case 'igual a':
+      planets = planetsInfo.filter((item) => item[column] === value);
+      break;
+    default: planets = planetsInfo;
+    }
+
+    setPlanetsInfo(planets);
+
+    setFilterByNumbers([{ column, comparison, value }]);
+  };
+
   const contextValue = {
     planetsInfo,
     getPlanetInfo,
     filterByName,
     Handlefilter,
+    filterByNumbers,
+    numberFilter,
   };
 
   return (
