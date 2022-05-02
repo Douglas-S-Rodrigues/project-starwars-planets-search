@@ -1,17 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useEffect } from 'react';
-import PlanetContext from '../context/PlanetContext';
+import React from 'react';
 import Table from '../components/Table';
+import FilterByName from '../filters/FilterByName';
+import FilterByNumber from '../components/FilterByNumber';
 
 function Home() {
-  const { getPlanetInfo } = useContext(PlanetContext);
-
-  useEffect(() => {
-    getPlanetInfo();
-  });
-
   return (
-    <Table />
+    <>
+      <FilterByName />
+      <FilterByNumber />
+      <Table />
+    </>
   );
 }
 

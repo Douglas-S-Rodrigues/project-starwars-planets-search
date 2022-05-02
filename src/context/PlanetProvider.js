@@ -1,61 +1,104 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import PlanetContext from './PlanetContext';
 import fetchPlanets from '../services/api';
 
 function PlanetProvider({ children }) {
-  const [planetsInfo, setPlanetsInfo] = useState([]);
-  const [filterByName, setFilterByName] = useState('');
-  const [filterByNumbers, setFilterByNumbers] = useState([]);
+  const [state, setState] = useState({
+    data: [],
+    planets: [],
+    name: '',
+    filterByNumber: [],
+  });
+  const [selected, setSelected] = useState({
+    column: 'population',
+    comparison: 'maior que',
+    value: 0,
+  });
 
-  async function getPlanetInfo() {
-    const planetsInfoResponse = await fetchPlanets();
-    setPlanetsInfo(planetsInfoResponse);
-  }
+  useEffect(() => {
+    fetchPlanets().then((response) => {
+      const data = response;
+      setState(() => ({
+        ...state,
+        data,
+        planets: data,
+      }));
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const Handlefilter = ({ target }) => {
     const { value } = target;
-    setFilterByName(value);
+    setState(() => ({
+      ...state,
+      name: value,
+      data: state.planets.filter(({ name }) => name.includes(value)),
+    }));
   };
 
-  const numberFilter = (column, comparison, value) => {
-    let planets = [];
+  const numberFilter = () => {
+    const { planets, filterByNumber } = state;
+    let data = planets;
+    filterByNumber.forEach(({ column, comparison, value }) => {
+      switch (comparison) {
+      case 'maior que':
+        data = data.filter((item) => Number(item[column]) > value);
+        break;
+      case 'menor que':
+        data = data.filter((item) => Number(item[column]) < value);
+        break;
+      case 'igual a':
+        data = data.filter((item) => item[column] === value);
+        break;
+      default:
+        return null;
+      }
+    });
+    setState(() => ({
+      ...state,
+      data,
+    }));
+  };
 
-    switch (comparison) {
-    case 'maior que':
-      planets = planetsInfo.filter((item) => Number(item[column]) > value);
-      break;
-    case 'menor que':
-      planets = planetsInfo.filter((item) => Number(item[column]) < value);
-      break;
-    case 'igual a':
-      planets = planetsInfo.filter((item) => item[column] === value);
-      break;
-    default: planets = planetsInfo;
-    }
+  useEffect(() => {
+    numberFilter();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.filterByNumber]);
 
-    setPlanetsInfo(planets);
-
-    setFilterByNumbers([{ column, comparison, value }]);
+  const setFilterByNumber = ({ column, comparison, value }) => {
+    setState(() => ({
+      ...state,
+      filterByNumber: [
+        ...state.filterByNumber,
+        {
+          column,
+          comparison,
+          value,
+        },
+      ],
+    }));
   };
 
   const contextValue = {
-    planetsInfo,
-    getPlanetInfo,
-    filterByName,
+    data: state.data,
+    filterByName: { name: state.name },
+    selected,
+    setSelected,
+    filterByNumber: state.filterByNumber,
     Handlefilter,
-    filterByNumbers,
-    numberFilter,
+    setFilterByNumber,
   };
 
   return (
     <PlanetContext.Provider value={ contextValue }>
-      { children }
+      {children}
     </PlanetContext.Provider>
   );
 }
 
 PlanetProvider.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.element.isRequired,
 };
 
 export default PlanetProvider;
